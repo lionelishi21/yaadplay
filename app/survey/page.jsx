@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Gamepad2, Check, ArrowRight, ArrowLeft, Home } from 'lucide-react';
+import { Check, ArrowRight, ArrowLeft, X } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SurveyPage() {
@@ -64,137 +64,40 @@ export default function SurveyPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-gray-100 border-b-2 border-gray-300">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <div className="w-14 h-14 rounded-2xl neumorphism-card flex items-center justify-center">
-                <Gamepad2 className="w-8 h-8 text-jamaica-green" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-black text-gray-800">YaadPlay</h1>
-                <p className="text-xs text-gray-600">Gaming Survey 🇯🇲</p>
-              </div>
-            </Link>
-            <Link
-              href="/"
-              className="neumorphism-button px-6 py-3 rounded-2xl flex items-center gap-2 text-gray-800 font-semibold hover:bg-gradient-to-r hover:from-jamaica-green hover:to-jamaica-yellow hover:text-white transition-all"
-            >
-              <Home className="w-5 h-5" />
-              <span className="hidden sm:inline">Back to Home</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Survey Content */}
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="neumorphism-card rounded-3xl p-8 md:p-12">
-          {/* Survey Progress Bar */}
-          <div className="mb-8">
-            <div className="flex gap-2 mb-4">
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((step) => (
-                <div
-                  key={step}
-                  className={`h-2 flex-1 rounded-full transition-all ${
-                    step <= surveyStep
-                      ? 'bg-gradient-to-r from-jamaica-green to-jamaica-yellow'
-                      : 'bg-gray-300'
-                  }`}
-                ></div>
-              ))}
-            </div>
-            <div className="text-sm font-semibold text-jamaica-green text-center">
-              Question {surveyStep + 1} of 10
-            </div>
-          </div>
-
-          {/* Survey Content */}
-          <div className="min-h-[400px]">
-            {surveySubmitted ? (
-              <div className="text-center py-12">
-                <div className="w-20 h-20 bg-gradient-to-br from-jamaica-green to-jamaica-yellow rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
-                  <Check className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-3xl font-black text-gray-800 mb-4">Thank You! 🎮</h3>
-                <p className="text-lg text-gray-600 mb-8">
-                  Your responses have been submitted successfully. We appreciate your feedback!
-                </p>
-                <Link
-                  href="/"
-                  className="inline-block px-8 py-3 rounded-2xl font-bold text-lg transition-all shadow-xl hover:shadow-2xl text-white"
-                  style={{
-                    background: 'linear-gradient(135deg, #00A859 0%, #FCD116 100%)',
-                  }}
-                >
-                  Back to Home
-                </Link>
-              </div>
-            ) : (
-              <SurveyStep
-                step={surveyStep}
-                surveyData={surveyData}
-                setSurveyData={setSurveyData}
-              />
-            )}
-          </div>
-
-          {/* Survey Navigation */}
-          {!surveySubmitted && (
-            <div className="mt-8 flex gap-4">
-              {surveyStep > 0 && (
-                <button
-                  onClick={() => setSurveyStep(surveyStep - 1)}
-                  className="flex-1 px-6 py-3 rounded-2xl font-semibold neumorphism-button text-gray-800 hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                  Previous
-                </button>
-              )}
-              <button
-                onClick={() => {
-                  if (surveyStep < 9) {
-                    setSurveyStep(surveyStep + 1);
-                  } else {
-                    handleSurveySubmit();
-                  }
-                }}
-                disabled={!isStepValid(surveyStep, surveyData)}
-                className="flex-1 px-6 py-3 rounded-2xl font-bold text-white transition-all shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                style={{
-                  background: 'linear-gradient(135deg, #00A859 0%, #FCD116 100%)',
-                }}
-              >
-                {surveyStep === 9 ? 'Submit' : 'Next'}
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Survey Step Component
-function SurveyStep({ step, surveyData, setSurveyData }) {
-  const handleMultiSelect = (field, value) => {
-    setSurveyData(prev => ({
-      ...prev,
-      [field]: prev[field].includes(value)
-        ? prev[field].filter(item => item !== value)
-        : [...prev[field], value]
-    }));
+  const handleNext = () => {
+    if (surveyStep < 9) {
+      setSurveyStep(surveyStep + 1);
+    } else {
+      handleSurveySubmit();
+    }
   };
 
-  const handleSingleSelect = (field, value) => {
-    setSurveyData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleOptionClick = (question, option) => {
+    if (question.type === "multi") {
+      const currentValues = surveyData[question.field] || [];
+      if (currentValues.includes(option)) {
+        setSurveyData(prev => ({
+          ...prev,
+          [question.field]: currentValues.filter(item => item !== option)
+        }));
+      } else {
+        setSurveyData(prev => ({
+          ...prev,
+          [question.field]: [...currentValues, option]
+        }));
+      }
+    } else {
+      setSurveyData(prev => ({
+        ...prev,
+        [question.field]: option
+      }));
+      // Auto-advance for single-select questions after a short delay
+      setTimeout(() => {
+        if (surveyStep < 9) {
+          handleNext();
+        }
+      }, 300);
+    }
   };
 
   const questions = [
@@ -353,50 +256,145 @@ function SurveyStep({ step, surveyData, setSurveyData }) {
     }
   ];
 
-  const question = questions[step];
+  const currentQuestion = questions[surveyStep];
+  const progress = ((surveyStep + 1) / questions.length) * 100;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-8">
-        <h3 className="text-3xl md:text-4xl font-black text-gray-800 mb-3 leading-tight">
-          {question.title}
-        </h3>
-        <p className="text-gray-600 text-lg">{question.subtitle}</p>
+    <div className="min-h-screen bg-white">
+      {/* Minimal Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img
+              src="/logo.png"
+              alt="YaadPlay Logo"
+              className="h-8 w-auto object-contain"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+            <span className="text-2xl font-bold text-black hover:text-accent-red transition-colors">YaadPlay</span>
+          </Link>
+          <button
+            onClick={() => {
+              if (confirm('Are you sure you want to leave? Your progress will be saved.')) {
+                window.location.href = '/';
+              }
+            }}
+            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+      </header>
+
+      {/* Progress Bar */}
+      <div className="fixed top-[73px] left-0 right-0 h-1 bg-gray-100 z-40">
+        <div 
+          className="h-full bg-accent-red transition-all duration-500 ease-out"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
-      <div className="space-y-3">
-        {question.options.map((option, index) => {
-          const isSelected = question.type === "multi"
-            ? surveyData[question.field].includes(option)
-            : surveyData[question.field] === option;
-
-          return (
-            <button
-              key={index}
-              onClick={() => {
-                if (question.type === "multi") {
-                  handleMultiSelect(question.field, option);
-                } else {
-                  handleSingleSelect(question.field, option);
-                }
-              }}
-              className={`w-full text-left p-5 rounded-2xl font-semibold transition-all ${
-                isSelected
-                  ? 'neumorphism-pressed bg-gradient-to-r from-jamaica-green/10 to-jamaica-yellow/10 border-2 border-jamaica-green'
-                  : 'neumorphism-button hover:shadow-xl'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className={isSelected ? 'text-jamaica-green font-bold text-lg' : 'text-gray-800 text-lg'}>
-                  {option}
-                </span>
-                {isSelected && (
-                  <Check className="w-6 h-6 text-jamaica-green" />
-                )}
+      {/* Main Survey Content */}
+      <div className="pt-32 pb-20 min-h-screen flex items-center">
+        <div className="max-w-3xl mx-auto px-6 w-full">
+          {surveySubmitted ? (
+            <div className="text-center animate-fadeIn">
+              <div className="w-24 h-24 bg-accent-red rounded-full flex items-center justify-center mx-auto mb-8">
+                <Check className="w-12 h-12 text-white" />
               </div>
-            </button>
-          );
-        })}
+              <h2 className="text-5xl md:text-6xl font-bold text-black mb-6">
+                Thank you! 🎮
+              </h2>
+              <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+                Your responses have been submitted successfully. We appreciate your feedback and will use it to improve your gaming experience!
+              </p>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-accent-red text-white font-semibold text-lg rounded-lg hover:bg-accent-dark-red transition-colors"
+              >
+                Back to Home
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          ) : (
+            <div className="animate-fadeIn">
+              {/* Question Number */}
+              <div className="text-sm text-gray-500 mb-8 font-medium">
+                Question {surveyStep + 1} of {questions.length}
+              </div>
+
+              {/* Question Title */}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-4 leading-tight">
+                {currentQuestion.title}
+              </h1>
+
+              {/* Question Subtitle */}
+              {currentQuestion.subtitle && (
+                <p className="text-lg md:text-xl text-gray-500 mb-12">
+                  {currentQuestion.subtitle}
+                </p>
+              )}
+
+              {/* Answer Options */}
+              <div className="space-y-3 mb-12">
+                {currentQuestion.options.map((option, index) => {
+                  const isSelected = currentQuestion.type === "multi"
+                    ? (surveyData[currentQuestion.field] || []).includes(option)
+                    : surveyData[currentQuestion.field] === option;
+
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => handleOptionClick(currentQuestion, option)}
+                      className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200 group ${
+                        isSelected
+                          ? 'border-accent-red bg-red-50 shadow-md'
+                          : 'border-gray-200 bg-white hover:border-accent-red/50 hover:shadow-sm'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`text-lg md:text-xl font-medium ${
+                          isSelected ? 'text-accent-red' : 'text-gray-900'
+                        }`}>
+                          {option}
+                        </span>
+                        {isSelected && (
+                          <div className="w-6 h-6 bg-accent-red rounded-full flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Navigation */}
+              <div className="flex items-center justify-between pt-8 border-t border-gray-100">
+                {surveyStep > 0 && (
+                  <button
+                    onClick={() => setSurveyStep(surveyStep - 1)}
+                    className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-black font-medium transition-colors"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                    Previous
+                  </button>
+                )}
+                <div className="flex-1" />
+                <button
+                  onClick={handleNext}
+                  disabled={!isStepValid(surveyStep, surveyData)}
+                  className="flex items-center gap-2 px-8 py-4 bg-accent-red text-white font-semibold rounded-lg hover:bg-accent-dark-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-accent-red"
+                >
+                  {surveyStep === 9 ? 'Submit' : 'Next'}
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
