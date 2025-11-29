@@ -14,6 +14,7 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  
   // Fetch products from Appwrite on component mount
   useEffect(() => {
     async function loadProducts() {
