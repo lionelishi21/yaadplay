@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Gamepad2, ShoppingCart, Gift, Search, Menu, X, Plus, Minus, Star, TrendingUp, Zap, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { getAllProducts, getProductsByCategory, searchProducts as searchProductsService, getFeaturedProducts } from '@/lib/products-service';
+import { getAllProducts, getProductsByCategory, searchProducts as searchProductsService, getFeaturedProducts } from '../lib/products-service';
 
 export default function Home() {
   const [cart, setCart] = useState([]);

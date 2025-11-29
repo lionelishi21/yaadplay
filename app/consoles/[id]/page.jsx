@@ -15,7 +15,7 @@ import {
   Zap
 } from 'lucide-react';
 import Link from 'next/link';
-import { getProductById } from '@/lib/products-service';
+import { getProductById } from '../../../lib/products-service';
 
 // Fallback console data (used if Appwrite is not configured)
 const fallbackConsoles = [
